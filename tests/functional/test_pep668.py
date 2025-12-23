@@ -15,7 +15,6 @@ def patch_check_externally_managed(virtualenv: VirtualEnvironment) -> None:
     # needs to go into), we patch the check to always raise a simple message.
     virtualenv.sitecustomize = textwrap.dedent(
         """\
-        import sys
         print("=== DEBUG: sitecustomize is being executed ===", file=sys.stderr)
         from pip._internal.exceptions import ExternallyManagedEnvironment
         from pip._internal.utils import misc
