@@ -112,6 +112,20 @@ def test(session: nox.Session) -> None:
     # Install test dependencies
     run_with_protected_pip(session, "install", "--group", "test")
 
+    # Bazaar tests run only under CI; install breezy and matching dulwich there
+    if os.environ.get("CI"):
+        run_with_protected_pip(session, "install", "breezy", "dulwich>=0.24.3,<0.25")
+        
+        # Create symlinks between brz and bzr for compatibility
+        bin_dir = Path(session.virtualenv.location) / "bin"
+        brz_path = bin_dir / "brz"
+        bzr_path = bin_dir / "bzr"
+        
+        if brz_path.exists() and not bzr_path.exists():
+            bzr_path.symlink_to(brz_path)
+        if bzr_path.exists() and not brz_path.exists():
+            brz_path.symlink_to(bzr_path)
+
     # Parallelize tests as much as possible, by default.
     arguments = session.posargs or ["-n", "auto"]
 

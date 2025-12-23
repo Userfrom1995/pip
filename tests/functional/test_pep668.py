@@ -15,13 +15,17 @@ def patch_check_externally_managed(virtualenv: VirtualEnvironment) -> None:
     # needs to go into), we patch the check to always raise a simple message.
     virtualenv.sitecustomize = textwrap.dedent(
         """\
+        import sys
+        print("=== DEBUG: sitecustomize is being executed ===", file=sys.stderr)
         from pip._internal.exceptions import ExternallyManagedEnvironment
         from pip._internal.utils import misc
 
         def check_externally_managed():
+            print("=== DEBUG: check_externally_managed is called ===", file=sys.stderr)
             raise ExternallyManagedEnvironment("I am externally managed")
 
         misc.check_externally_managed = check_externally_managed
+        print("=== DEBUG: check_externally_managed has been patched ===", file=sys.stderr)
         """
     )
 
